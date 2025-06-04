@@ -1,10 +1,11 @@
 package org.example;
 
+import java.io.Serializable;
 import java.util.*;
 
-public class Directory extends FileEntry {
+public class Directory extends FileEntry{
     private Map<String, FileEntry> entries;
-    private Directory parent;
+    private transient Directory parent;
 
     public Directory(String name) {
         super(name);

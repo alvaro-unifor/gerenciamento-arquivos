@@ -1,8 +1,9 @@
 package org.example;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
-public abstract class FileEntry {
+public abstract class FileEntry implements Serializable {
     protected String name;
     protected LocalDateTime createdAt;
     protected LocalDateTime updatedAt;

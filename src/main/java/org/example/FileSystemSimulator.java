@@ -4,6 +4,7 @@ import org.example.Directory;
 import org.example.FileEntry;
 import org.example.Journal;
 
+import java.io.*;
 import java.util.*;
 
 public class FileSystemSimulator {
@@ -12,6 +13,7 @@ public class FileSystemSimulator {
 
     public FileSystemSimulator() {
         root = new Directory("root", null);
+        loadFileSystem();
         journal = new Journal();
         journal.loadJournal();
     }
@@ -121,6 +123,38 @@ public class FileSystemSimulator {
         System.out.println("exit                - sair do simulador");
     }
 
+    private void saveFileSystem() {
+        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream("filesystem.dat"))) {
+            out.writeObject(root);
+        } catch (IOException e) {
+            System.err.println("Erro ao salvar sistema de arquivos: " + e.getMessage());
+        }
+    }
+
+    private void loadFileSystem() {
+        java.io.File f = new java.io.File("filesystem.dat");
+        if (!f.exists()) {
+            root = new Directory("root", null);
+            return;
+        }
+        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(f))) {
+            root = (Directory) in.readObject();
+            rebuildParents(root, null);
+        } catch (Exception e) {
+            System.err.println("Erro ao carregar sistema de arquivos: " + e.getMessage());
+            root = new Directory("root", null);
+        }
+    }
+
+    private void rebuildParents(Directory dir, Directory parent) {
+        dir.setParent(parent);
+        for (FileEntry entry : dir.getEntries().values()) {
+            if (entry instanceof Directory) {
+                rebuildParents((Directory) entry, dir);
+            }
+        }
+    }
+
     private void listDir(Directory dir) {
         for (FileEntry entry : dir.getEntries().values()) {
             System.out.println((entry.isDirectory() ? "[DIR] " : "[ARQ] ") + entry.getName());
@@ -129,13 +163,15 @@ public class FileSystemSimulator {
 
     private void makeDir(Directory dir, String name) {
         if (dir.getEntries().containsKey(name)) throw new RuntimeException("Já existe!");
-        dir.addEntry(new Directory(name, dir)); // Passa o parent
+        dir.addEntry(new Directory(name, dir));
+        saveFileSystem();
         System.out.println("Diretório criado: " + name);
     }
 
     private void createFile(Directory dir, String name) {
         if (dir.getEntries().containsKey(name)) throw new RuntimeException("Já existe!");
         dir.addEntry(new File(name));
+        saveFileSystem();
         System.out.println("Arquivo criado: " + name);
     }
 
@@ -143,6 +179,7 @@ public class FileSystemSimulator {
         FileEntry entry = dir.getEntries().get(name);
         if (entry == null || entry.isDirectory()) throw new RuntimeException("Arquivo não encontrado ou é diretório.");
         dir.removeEntry(name);
+        saveFileSystem();
         System.out.println("Arquivo removido: " + name);
     }
 
@@ -152,6 +189,7 @@ public class FileSystemSimulator {
         if (dir.getEntries().containsKey(dest)) throw new RuntimeException("Destino já existe!");
         File origFile = (File) entry;
         dir.addEntry(new File(dest, origFile.getContent()));
+        saveFileSystem();
         System.out.println("Arquivo copiado para: " + dest);
     }
 
@@ -162,6 +200,7 @@ public class FileSystemSimulator {
         entry.setName(newName);
         dir.getEntries().remove(oldName);
         dir.addEntry(entry);
+        saveFileSystem();
         System.out.println("Renomeado para: " + newName);
     }
 
@@ -171,6 +210,7 @@ public class FileSystemSimulator {
         Directory d = (Directory) entry;
         if (!d.getEntries().isEmpty()) throw new RuntimeException("Diretório não está vazio.");
         dir.removeEntry(name);
+        saveFileSystem();
         System.out.println("Diretório removido: " + name);
     }
 
