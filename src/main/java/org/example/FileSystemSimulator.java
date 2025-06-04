@@ -1,9 +1,5 @@
 package org.example;
 
-import org.example.Directory;
-import org.example.FileEntry;
-import org.example.Journal;
-
 import java.io.*;
 import java.util.*;
 
@@ -53,7 +49,7 @@ public class FileSystemSimulator {
                     case "touch":
                         if (parts.length < 2) System.out.println("Uso: touch <nome>");
                         else {
-                            createFile(currentDir, parts[1]);
+                            createFile(currentDir, parts[1], scanner);
                             journal.logOperation("touch " + currentPath + parts[1]);
                         }
                         break;
@@ -100,6 +96,12 @@ public class FileSystemSimulator {
                     case "journal":
                         journal.printJournal();
                         break;
+                    case "cat":
+                        if (parts.length < 2) System.out.println("Uso: cat <nome>");
+                        else {
+                            showFileContent(currentDir, parts[1]);
+                        }
+                        break;
                     default:
                         System.out.println("Comando desconhecido. Use 'help' para ajuda.");
                 }
@@ -113,7 +115,8 @@ public class FileSystemSimulator {
         System.out.println("Comandos disponíveis:");
         System.out.println("ls                  - lista arquivos/diretórios");
         System.out.println("mkdir <nome>        - cria diretório");
-        System.out.println("touch <nome>        - cria arquivo vazio");
+        System.out.println("touch <nome>        - cria arquivo (com ou sem conteúdo)");
+        System.out.println("cat <nome>          - mostra conteúdo do arquivo");
         System.out.println("rm <nome>           - remove arquivo");
         System.out.println("cp <origem> <dest>  - copia arquivo");
         System.out.println("mv <origem> <novo>  - renomeia arquivo/diretório");
@@ -168,11 +171,37 @@ public class FileSystemSimulator {
         System.out.println("Diretório criado: " + name);
     }
 
-    private void createFile(Directory dir, String name) {
+    private void createFile(Directory dir, String name, Scanner scanner) {
         if (dir.getEntries().containsKey(name)) throw new RuntimeException("Já existe!");
-        dir.addEntry(new File(name));
+        
+        System.out.print("Deseja adicionar conteúdo ao arquivo? (s/n): ");
+        String resposta = scanner.nextLine().trim().toLowerCase();
+        
+        String content = "";
+        if (resposta.equals("s")) {
+            System.out.println("Digite o conteúdo do arquivo (digite 'EOF' em uma linha separada para finalizar):");
+            StringBuilder contentBuilder = new StringBuilder();
+            String line;
+            while (!(line = scanner.nextLine()).equals("EOF")) {
+                contentBuilder.append(line).append("\n");
+            }
+            content = contentBuilder.toString().trim();
+        }
+        
+        dir.addEntry(new File(name, content));
         saveFileSystem();
         System.out.println("Arquivo criado: " + name);
+    }
+
+    private void showFileContent(Directory dir, String name) {
+        FileEntry entry = dir.getEntries().get(name);
+        if (entry == null || entry.isDirectory()) {
+            System.out.println("Arquivo não encontrado ou é um diretório.");
+            return;
+        }
+        File file = (File) entry;
+        System.out.println("Conteúdo de " + name + ":");
+        System.out.println(file.getContent());
     }
 
     private void removeEntry(Directory dir, String name) {
@@ -239,11 +268,5 @@ public class FileSystemSimulator {
         }
         Collections.reverse(names);
         return "/" + String.join("/", names);
-    }
-
-    // Método main para rodar o simulador
-    public static void main(String[] args) {
-        FileSystemSimulator sim = new FileSystemSimulator();
-        sim.startShell();
     }
 }

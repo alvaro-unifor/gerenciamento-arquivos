@@ -1,0 +1,10 @@
+mkdir /teste01
+rmdir /teste01
+mkdir /home
+touch /homelistacompras.txt
+rm /homelistacompras.txt
+rmdir /home
+mkdir /teste01
+rmdir /teste01
+mkdir /teste02
+touch /teste02testando02
