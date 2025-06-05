@@ -1,28 +1,42 @@
-Metodologia:
+# 🗂️ Simulador de Sistema de Arquivos com Journaling em Java
 
-O simulador será desenvolvido em linguagem de programação Java. Ele receberá as chamadas de métodos com os devido parâmetros. Em seguida, serão implementados os métodos correspondentes aos comandos de um SO. 
+Repositório disponível em: [link-do-seu-repositorio]
 
-O programa executará cada funcionalidade e exibirá o resultado na tela quando necessário.
+Este projeto implementa um simulador completo de sistema de arquivos com journaling, permitindo criar, manipular e gerenciar arquivos e diretórios através de um shell interativo, com registro persistente de todas as operações.
 
-Parte 1: Introdução ao Sistema de Arquivos com Journaling
+## 1. 📂 Descrição do Sistema de Arquivos e Journaling
 
-Descrição do sistema de arquivos: Explique o que é um sistema de arquivos, sua importância e o conceito de journaling.
+### Sistema de Arquivos
+Um sistema de arquivos é a estrutura lógica que gerencia como os dados são armazenados e recuperados em dispositivos de armazenamento. Nosso simulador implementa:
 
-Journaling: Descreva o propósito e funcionamento do Journaling em sistemas de arquivos, incluindo os tipos de journaling (write-ahead logging, log-structured, etc.).
+- **Hierarquia de diretórios** (estrutura em árvore)
+- **Operações básicas** (criar, mover, copiar, remover)
+- **Persistência** (salvamento automático do estado)
 
-Parte 2: Arquitetura do Simulador
+### 🧾 Journaling Implementado
+Nosso sistema utiliza **write-ahead logging** para:
 
-Estrutura de Dados: Descreva as estruturas de dados utilizadas para representar o sistema de arquivos. Utilizaremos classes Java para representar arquivos, diretórios e o sistema de arquivos em si.
+- Garantir **integridade** dos dados
+- Permitir **recuperação** após falhas
+- Manter **histórico completo** de operações
 
-Journaling: Explique como o journaling será implementado, incluindo a estrutura do log e as operações registradas.
+**Funcionamento:**
+1. Antes de executar a operação, registra no log
+2. Executa a operação no sistema de arquivos
+3. Atualiza o timestamp da operação
 
-Parte 3: Implementação em Java
+**Características:**
+- Log estruturado em `filesystem.journal`
+- Registro de todas as operações com timestamp
+- Persistência entre execuções
 
-Classe "FileSystemSimulator": Implementa o simulador do sistema de arquivos, incluindo métodos para cada operação.
+## 2. 🏗️ Estrutura de Dados e Arquitetura
 
-Classes File e Directory: Representam arquivos e diretórios.
-
-Classe Journal: Gerencia o log de operações.
-
-Parte 4: Instalação e funcionamento 
-- Aqui indiquem um passo a passo sobre os recursos usados na implementação e orientações sobre a execução do simulador.
+### Classes Principais
+```java
+org.example.
+├── FileSystemSimulator.java  # Gerencia todo o sistema
+├── FileEntry.java           # Classe abstrata base
+├── File.java                # Arquivos com conteúdo
+├── Directory.java           # Diretórios hierárquicos
+└── Journal.java             # Sistema de journaling
