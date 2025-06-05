@@ -1,6 +1,6 @@
 # 🗂️ Simulador de Sistema de Arquivos com Journaling em Java
 
-Repositório disponível em: [link-do-seu-repositorio]
+Repositório disponível em: https://github.com/alvaro-unifor/gerenciamento-arquivos
 
 Este projeto implementa um simulador completo de sistema de arquivos com journaling, permitindo criar, manipular e gerenciar arquivos e diretórios através de um shell interativo, com registro persistente de todas as operações.
 
