@@ -14,7 +14,7 @@ Um sistema de arquivos é a estrutura lógica que gerencia como os dados são ar
 - **Persistência** (salvamento automático do estado)
 
 ### 🧾 Journaling Implementado
-Nosso sistema utiliza **write-ahead logging** para:
+Nosso sistema guarda os **logs** para:
 
 - Garantir **integridade** dos dados
 - Permitir **recuperação** após falhas
